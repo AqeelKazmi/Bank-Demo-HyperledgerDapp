@@ -1,0 +1,86 @@
+/**
+ * Write your model definitions here
+ */
+
+namespace org.bank.demo
+
+enum Verification {
+  o PENDING
+  o VERIFIED
+  o NOT_VERIFIED
+}
+
+enum Status {
+  o PENDING  
+  o SUCCESS
+  o REJECTED
+}
+
+abstract participant User identified by id {
+  o String id
+  o String firstName
+  o String lastName
+  o String email
+  o String accountNumber
+  --> AccountDetails accountDetails
+}
+
+participant Buyer extends User {
+  o Verification ntn
+}
+
+participant Seller extends User {
+  o Verification bln
+}
+
+asset AccountDetails identified by accountNumber {
+  o String accountNumber
+  o String accountTitle
+  --> Bank bankID
+  o Double balance
+}
+
+enum Shipment {
+  o PENDING
+  o DONE
+  o CANCEL
+}
+
+participant Bank identified by id {
+  o String id //name + branchCode
+  o String branchCode
+  o String name
+  o String country
+}
+
+enum ApplicationType {
+  o LOC
+  o BOL
+}
+
+abstract asset Application identified by applicationId {
+  o String applicationId
+  --> Bank issuingBank
+  --> Bank advisingBank
+  o ApplicationType applicationType
+  o Double amount
+  o Status status
+  o String description
+}
+
+asset Loc extends Application {
+  --> Buyer buyer
+}
+
+asset Bol extends Application {
+  --> Seller seller
+  o Shipment shipment
+}
+
+transaction GenerateLOC  {
+  --> Loc locTx
+}
+
+transaction VerifyBOL  {
+  --> Bol bolTx
+}
